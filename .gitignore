@@ -1,0 +1,9 @@
+# Environment file
+.env
+
+# Node modules folder
+node_modules/
+
+
+# image folder
+uploads
