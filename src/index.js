@@ -14,7 +14,8 @@ const generateBillRoute = require("./routes/generateBillRoute/generateBillRoute.
 
 dotenv.config(); // Load environment variables
 connectDB(); // Connect to database
-console.log("✅ MONGO_URI:", process.env.MONGO_URI)
+console.log("✅ Server starting...");
+console.log("✅ MONGO_URI:", process.env.MONGO_URI || "❌ Not Found");
 
 const app = express();
 
