@@ -27,8 +27,7 @@ const registered = async (req, res) => {
 
 const login = async (req, res) => {
     const { email, password } = req.body;
-    console.log('JWT_SECRET:', process.env.JWT_SECRET);
-  
+
     try {
       if (!email || !password) {
         return res.status(400).json({ message: 'Please provide both email and password' });
@@ -48,7 +47,6 @@ const login = async (req, res) => {
   
       res.json({ token, user: { id: user._id, name: user.name, email: user.email } });
     } catch (err) {
-      console.error('Login error:', err);
       res.status(500).json({ message: 'Server error' });
     }
   };
@@ -92,7 +90,6 @@ const updateUser = async (req, res) => {
 
         res.status(200).send({ message: "User updated successfully", user: updatedUser });
     } catch (error) {
-        console.error("Update user error:", error);
         res.status(500).send({ message: "Error updating user", error: error.message });
     }
 };

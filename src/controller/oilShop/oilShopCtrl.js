@@ -52,7 +52,6 @@ const getAllProduct = async (req, res) => {
 const deleteProductCtrl = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log("id", id);
     const deleted = await Product.findByIdAndDelete(id);
 
     if (!deleted) {
@@ -91,39 +90,6 @@ const updateProductController = async (req, res) => {
   }
 };
 
-// const saleProductCtrl = async (req, res) => {
-//   try {
-//     const { productId, quantitySold, sellingPrice } = req.body;
-  
-//     const product = await Sale.find().populate("productId");
-
-//     console.log("product" , product)
-//     if (!product || product.quantity < quantitySold) {
-//       return res
-//         .status(400)
-//         .json({ message: "Invalid product or insufficient stock" });
-//     }
-
- 
-
-//     product.quantity -= quantitySold;
-//     await product.save();
-
-//     // Record sale
-//     const sale = await Sale.create({
-//       productId,
-//       quantitySold,
-//       sellingPrice,
-//     });
-
-//     res.status(200).json({ message: "Product sale successfully", sale });
-//   } catch (error) {
-//     console.log("error", error);
-//     res.status(500).json({ message: "Something went wrong.", error });
-//   }
-// };
-
-
 
 const saleProductCtrl = async (req, res) => {
   try {
@@ -152,7 +118,6 @@ const saleProductCtrl = async (req, res) => {
 
     res.status(200).json({ message: "Product sale successfully", sale: populatedSale });
   } catch (error) {
-    console.log("error", error);
     res.status(500).json({ message: "Something went wrong.", error });
   }
 };

@@ -7,7 +7,6 @@ const carDetailing = require("../../models/carDetailing/carDetailingModel");
 
 const generateBillController = async (req, res) => {
   const { records } = req.body;
-  console.log("Records:", records);
 
   if (!Array.isArray(records)) {
     return res.status(400).json({ message: "Records should be an array" });
@@ -86,8 +85,7 @@ const generateBillController = async (req, res) => {
       } else if (category === "accessoriesShop") {
         const { productId, quantitySold, sellingPrice } = record;
         await AccessoriesSale.create({ productId, quantitySold, sellingPrice });
-        console.log("id product", productId);
-
+    
         const accessory = await Accessories.findById(productId);
         accessory.quantity -= quantitySold;
         await accessory.save();
@@ -96,7 +94,7 @@ const generateBillController = async (req, res) => {
 
     return res.status(200).json({ message: "All records saved successfully" });
   } catch (error) {
-    console.error("Error in /submit-sales:", error);
+
     return res
       .status(500)
       .json({ message: error.message || "Internal server error" });

@@ -50,7 +50,6 @@ const getAllItemAccessories = async (req, res) => {
 const deleteItemAccessories = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log("id", id);
     const deleted = await Accessories.findByIdAndDelete(id);
 
     if (!deleted) {
