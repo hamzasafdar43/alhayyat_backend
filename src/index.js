@@ -7,7 +7,6 @@ const router = require("./routes/carWash/carwashRoutes.js");
 const oilShopRoute = require("./routes/oilShop/oliShopRoute.js");
 const accessoriesRoute = require("./routes/accessories/accessoriesRoute.js");
 const generateBillRoute = require("./routes/generateBillRoute/generateBillRoute.js")
-const detailingStudioBillRoute = require("./routes/detailingStudio/detailingStudioRoute.js")
 
 
 
@@ -32,13 +31,13 @@ app.use("/" , router)
 app.use("/" , oilShopRoute)
 app.use("/" , accessoriesRoute)
 app.use("/" , generateBillRoute)
-app.use("/" , detailingStudioBillRoute)
-
 
 
 app.use('/uploads', express.static('uploads'));
 
 
 
-const PORT = process.env.PORT 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// const PORT = process.env.PORT 
+// app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+module.exports = app;
