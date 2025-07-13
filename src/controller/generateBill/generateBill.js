@@ -57,7 +57,7 @@ const generateBillController = async (req, res) => {
     for (const record of records) {
       const { category } = record;
       if (category === "cardetailng") {
-        const { carName, polish, detailingMaster, detailingBill, commission } =
+        const { carNameDetailing , polish, detailingMaster, detailingBill, commission } =
           record;
         await carDetailing.create({
          carNameDetailing,
@@ -94,7 +94,7 @@ const generateBillController = async (req, res) => {
       }
     }
 
-    return res.status(200).json({ message: "All records saved successfully." });
+    return res.status(200).json({ message: "All records saved successfully" });
   } catch (error) {
     console.error("Error in /submit-sales:", error);
     return res
