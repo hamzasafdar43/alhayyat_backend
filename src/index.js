@@ -7,6 +7,7 @@ const router = require("./routes/carWash/carwashRoutes.js");
 const oilShopRoute = require("./routes/oilShop/oliShopRoute.js");
 const accessoriesRoute = require("./routes/accessories/accessoriesRoute.js");
 const generateBillRoute = require("./routes/generateBillRoute/generateBillRoute.js")
+const serverless = require("serverless-http");
 
 
 
@@ -39,4 +40,4 @@ app.use('/uploads', express.static('uploads'));
 
 
 
-module.exports = app;
+module.exports = serverless(app);
