@@ -1,9 +1,11 @@
+const { getDateRange } = require("../../../utils/dateFilters");
 const carWash = require("../../models/carWash/carwashModel")
+
 
 // generatecarwashbillCtrl
 const generatecarwashbillCtrl = async (req, res) => {
     try {
-        const { carName, bill, commission, carWasher,  phoneNumber } = req.body;
+        const { carName, bill, commission, carWasher,  phoneNumber  } = req.body;
 
         const newBill = new carWash({  
             carName,
@@ -23,16 +25,69 @@ const generatecarwashbillCtrl = async (req, res) => {
 
 
 
-// get all product 
+// /controllers/carWashController.js
+
+// 1. Get all bills by filter (day, month, year)
 const getallbills = async (req , res) => {
-    try {
-        const getallcarWashbill = await carWash.find()
-        res.status(200).json(getallcarWashbill);
-    } catch (error) {
-        res.status(500).json({ message: "Failed to get products", error: error.message });
-    }
+   try {
+    const filter = req.query.filter; 
+    const { start, end } = getDateRange(filter);
+
+    const bills = await carWash.find({
+      createdAt: { $gte: start, $lte: end }
+    });
+   
+    res.status(200).json(bills);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to get filtered bills", error: error.message });
+  }
 }
 
+// 2. Get bills by specific date
+const getCarWashBillByDate = async (req, res) => {
+  const { date } = req.query;
+
+  if (!date) return res.status(400).json({ message: "Date is required" });
+
+  const d = new Date(date);
+  const start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0);
+  const end   = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
+
+  const bills = await carWash.find({
+    createdAt: { $gte: start, $lte: end },
+  });
+
+  res.json(bills);
+}
+
+const updateCommissionStatus = async (req, res) => {
+    try {
+        const { _id } = req.body;
+
+        console.log("id...."  , _id)
+
+        const carWashRecord = await carWash.findById(_id);
+
+        if (!carWashRecord) {
+            return res.status(404).json({ message: "Car wash record not found" });
+        }
+
+        if (carWashRecord.commissionStatus === "pending") {
+            carWashRecord.commissionStatus = "Paid";
+            await carWashRecord.save();
+        }
+
+        const { carWasher, commission } = carWashRecord;
+
+        res.status(200).json({
+            message: `Successfully paid ${carWasher} total ${commission}`,
+            carWash: carWashRecord
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: "Failed to update commission status", error: error.message });
+    }
+};
 
 
 // updateProduct
@@ -70,6 +125,8 @@ module.exports = {
     generatecarwashbillCtrl,
     getallbills,
     updateCarWashbill,
-    deleteCarWashbill
+    deleteCarWashbill,
+    getCarWashBillByDate,
+    updateCommissionStatus
 
 };

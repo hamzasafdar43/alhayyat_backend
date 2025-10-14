@@ -1,7 +1,6 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
-const serverless = require("serverless-http");
 
 const connectDB = require("./config/db");
 
@@ -40,5 +39,4 @@ app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
 
-// For serverless deployment (comment out above `app.listen()` if using serverless)
-// module.exports = serverless(app);
+

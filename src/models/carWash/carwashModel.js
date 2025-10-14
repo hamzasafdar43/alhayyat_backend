@@ -22,6 +22,10 @@ const carWashSchema = new mongoose.Schema({
     phoneNumber:{
         type:String,
      
+    },
+    commissionStatus : {
+        type:String,
+        default :"pending"
     }
    
  
