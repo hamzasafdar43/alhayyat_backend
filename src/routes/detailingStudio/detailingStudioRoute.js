@@ -1,9 +1,11 @@
 const express = require("express");
-const { getallDetailingStudioBills } = require("../../controller/detailingStudio/detailingStudio");
+const { getAllDetailingStudioBills, getDetailingBillByDate, updateDetailingCommissionStatus } = require("../../controller/detailingStudio/detailingStudio");
 const router = express.Router();
 
 
-router.get("/detailing-studio-bills" , getallDetailingStudioBills )
+router.get("/detailing/bills", getAllDetailingStudioBills);
+router.get("/detailing/bills-by-date", getDetailingBillByDate);
+router.put("/detailing/update-commission", updateDetailingCommissionStatus);
 
 
 module.exports = router;

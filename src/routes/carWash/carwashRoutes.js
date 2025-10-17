@@ -9,7 +9,7 @@ const { saveOilShopProduct } = require("../../controller/oilShop/oilShopCtrl");
 
 router.post("/carWash-bill",  generatecarwashbillCtrl  );
 router.get("/carWash-bills",  getallbills);
-router.get("/commission-paid",  updateCommissionStatus);
+router.post("/commission-paid",  updateCommissionStatus);
 
 router.get("/carWash-bill-date",  getCarWashBillByDate);
 router.delete("/carWash-bill-delete/:id",  deleteCarWashbill);

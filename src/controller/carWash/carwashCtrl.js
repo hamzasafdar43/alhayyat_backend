@@ -2,16 +2,18 @@ const { getDateRange } = require("../../../utils/dateFilters");
 const carWash = require("../../models/carWash/carwashModel")
 
 
-// generatecarwashbillCtrl
+// ============================================================================
+// 🟨 1. // generatecarwashbillCtrl
+// ============================================================================
 const generatecarwashbillCtrl = async (req, res) => {
     try {
-        const { carName, bill, commission, carWasher,  phoneNumber  } = req.body;
+        const { carName, bill, commission, carWasher, phoneNumber } = req.body;
 
-        const newBill = new carWash({  
+        const newBill = new carWash({
             carName,
             bill,
             commission,
-            carWasher, 
+            carWasher,
             phoneNumber
         });
 
@@ -24,47 +26,49 @@ const generatecarwashbillCtrl = async (req, res) => {
 };
 
 
+// ============================================================================
+// 🟨 2. Get all bills by filter (day, month, year)
+// ============================================================================
+const getallbills = async (req, res) => {
+    try {
+        const filter = req.query.filter;
+        const { start, end } = getDateRange(filter);
 
-// /controllers/carWashController.js
+        const bills = await carWash.find({
+            createdAt: { $gte: start, $lte: end }
+        });
 
-// 1. Get all bills by filter (day, month, year)
-const getallbills = async (req , res) => {
-   try {
-    const filter = req.query.filter; 
-    const { start, end } = getDateRange(filter);
+        res.status(200).json(bills);
+    } catch (error) {
+        res.status(500).json({ message: "Failed to get filtered bills", error: error.message });
+    }
+}
+
+// ============================================================================
+// 🟨 3. Get bills by specific date
+// ============================================================================
+const getCarWashBillByDate = async (req, res) => {
+    const { date } = req.query;
+
+    if (!date) return res.status(400).json({ message: "Date is required" });
+
+    const d = new Date(date);
+    const start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0);
+    const end = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
 
     const bills = await carWash.find({
-      createdAt: { $gte: start, $lte: end }
+        createdAt: { $gte: start, $lte: end },
     });
-   
-    res.status(200).json(bills);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to get filtered bills", error: error.message });
-  }
+
+    res.json(bills);
 }
 
-// 2. Get bills by specific date
-const getCarWashBillByDate = async (req, res) => {
-  const { date } = req.query;
-
-  if (!date) return res.status(400).json({ message: "Date is required" });
-
-  const d = new Date(date);
-  const start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0);
-  const end   = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
-
-  const bills = await carWash.find({
-    createdAt: { $gte: start, $lte: end },
-  });
-
-  res.json(bills);
-}
-
+// ============================================================================
+// 🟨 4. Update Car Wash Commission Status
+// ============================================================================
 const updateCommissionStatus = async (req, res) => {
     try {
         const { _id } = req.body;
-
-        console.log("id...."  , _id)
 
         const carWashRecord = await carWash.findById(_id);
 
@@ -90,9 +94,12 @@ const updateCommissionStatus = async (req, res) => {
 };
 
 
-// updateProduct
+
+// ============================================================================
+// 🟨 5. Update Car Wash Bill Record
+// ============================================================================
 const updateCarWashbill = async (req, res) => {
-   
+
     try {
         const updatedbill = await carWash.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
@@ -107,7 +114,9 @@ const updateCarWashbill = async (req, res) => {
 };
 
 
-// deleteProduct
+// ============================================================================
+// 🟨 6. Delete Car Wash Bill Record
+// ============================================================================
 const deleteCarWashbill = async (req, res) => {
     try {
         const deletedbill = await carWash.findByIdAndDelete(req.params.id);
