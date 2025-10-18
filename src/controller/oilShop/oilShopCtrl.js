@@ -35,7 +35,8 @@ const saveOilShopProduct = async (req, res) => {
 
 const getAllProduct = async (req, res) => {
   try {
-    const getAllProduct = await Product.find();
+     const userId = req.user.id;
+    const getAllProduct = await Product.find({userId});
     if (!getAllProduct) {
       res.status(404).json({ message: "Products not founded", error });
     }

@@ -58,33 +58,40 @@ const generateBillController = async (req, res) => {
       if (category === "cardetailng") {
         const { carNameDetailing , polish, detailingMaster, detailingBill, commission } =
           record;
+          const userId = req.user.id
         await carDetailing.create({
          carNameDetailing,
           polish,
           detailingMaster,
           detailingBill,
           commission,
+          userId
         });
       }
       if (category === "CarWash") {
         const { carName, bill, commission, carWasher, phoneNumber } = record;
+        const userId = req.user.id
         await CarWash.create({
           carName,
           bill,
           commission,
           carWasher,
           phoneNumber,
+          userId
         });
       } else if (category === "oilShop") {
         const { productId, quantitySold, sellingPrice } = record;
-        await OilShopSale.create({ productId, quantitySold, sellingPrice });
+        const userId = req.user.id
+
+        await OilShopSale.create({ productId, quantitySold, sellingPrice , userId });
 
         const product = await OilShop.findById(productId);
         product.quantity -= quantitySold;
         await product.save();
       } else if (category === "accessoriesShop") {
         const { productId, quantitySold, sellingPrice } = record;
-        await AccessoriesSale.create({ productId, quantitySold, sellingPrice });
+        const userId = req.user.id
+        await AccessoriesSale.create({ productId, quantitySold, sellingPrice , userId });
     
         const accessory = await Accessories.findById(productId);
         accessory.quantity -= quantitySold;

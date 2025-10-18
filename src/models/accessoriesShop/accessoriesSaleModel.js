@@ -14,6 +14,11 @@ const accessoriesSaleSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    require: true
+  }
 }, { timestamps: true });
 
 const Sale = mongoose.model("SaleAccessories", accessoriesSaleSchema);

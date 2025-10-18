@@ -35,7 +35,8 @@ const AddItemAccessories = async (req, res) => {
 
 const getAllItemAccessories = async (req, res) => {
   try {
-    const getAllProduct = await Accessories.find();
+    const userId = req.user.id;
+    const getAllProduct = await Accessories.find({userId});
     if (!getAllProduct) {
       res.status(404).json({ message: "Products not founded", error });
     }
