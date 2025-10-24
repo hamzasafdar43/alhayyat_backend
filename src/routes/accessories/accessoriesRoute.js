@@ -1,18 +1,20 @@
 const express = require("express");
 const upload = require("../../middleware/upload");
 const UserAuthenication = require("../../middleware/UserAuthenication");
-const { AddItemAccessories, getAllItemAccessories, updateItemAccessories, deleteItemAccessories, allSaleAccessoriesController } = require("../../controller/accessoriesShop/accessoriesShopCtrl");
+const { AddItemAccessories, getAllItemAccessories, updateItemAccessories, deleteItemAccessories, SaleAccessoriesCtr, updateAccessoriesSale, deleteAccessoriesSale } = require("../../controller/accessoriesShop/accessoriesShopCtrl");
 const router = express.Router();
 
- 
-
-router.post("/add-accessories-item", UserAuthenication,  upload.single("image") ,  AddItemAccessories  );
-router.get("/all-accessories", UserAuthenication ,  getAllItemAccessories  );
-router.put("/update-accessories-items/:id",UserAuthenication , upload.single("image") , updateItemAccessories );
-router.delete("/delete-accessories-items/:id", UserAuthenication,    deleteItemAccessories);
 
 
-router.get("/all-sale-accessories",   allSaleAccessoriesController  );
+router.post("/add-accessories-item", UserAuthenication, upload.single("image"), AddItemAccessories);
+router.get("/all-accessories", UserAuthenication, getAllItemAccessories);
+router.put("/update-accessories-items/:id", UserAuthenication, upload.single("image"), updateItemAccessories);
+router.delete("/delete-accessories-items/:id", UserAuthenication, deleteItemAccessories);
+
+
+router.get("/accessories-sales", UserAuthenication, SaleAccessoriesCtr);
+router.delete("/accessories-sales-delete/:id", UserAuthenication, deleteAccessoriesSale);
+router.put("/accessories-sales-update/:id", UserAuthenication, updateAccessoriesSale);
 
 
 

@@ -1,29 +1,32 @@
 const Product = require("../../models/oilShop/oilShopModel");
 const Sale = require("../../models/oilShop/saleProductModel");
+const { getDateRange } = require("../../../utils/dateFilters");
 
-
-const saveOilShopProduct = async (req, res) => {
+// ============================================================================
+// 🟨 1. Add Oil Shop Product
+// ============================================================================
+const addOilShopProduct = async (req, res) => {
   try {
     const { productName, price, cost, quantity } = req.body;
     const imageFile = req.file;
+    const userId = req.user.id;
 
     if (!imageFile) {
       return res.status(400).json({ message: "Image is required." });
     }
 
-    const existProductName = await Product.findOne({ productName });
-
+    const existProductName = await Product.findOne({ productName, userId });
     if (existProductName) {
       return res.status(400).json({ message: "Product name already exists." });
     }
 
-
     const newProduct = new Product({
       productName,
-      image: imageFile.filename, // saved filename from multer
+      image: imageFile.filename,
       price,
       cost,
       quantity,
+      userId,
     });
 
     await newProduct.save();
@@ -33,119 +36,221 @@ const saveOilShopProduct = async (req, res) => {
   }
 };
 
-const getAllProduct = async (req, res) => {
+// ============================================================================
+// 🟨 2. Get All Oil Shop Products
+// ============================================================================
+const getAllOilShopProducts = async (req, res) => {
   try {
-     const userId = req.user.id;
-    const getAllProduct = await Product.find({userId});
-    if (!getAllProduct) {
-      res.status(404).json({ message: "Products not founded", error });
+    const userId = req.user.id;
+    const products = await Product.find({ userId });
+
+    if (!products.length) {
+      return res.status(404).json({ message: "No products found." });
     }
+
     res
       .status(200)
-      .send({ message: "Get All Product Successfully", data: getAllProduct });
+      .json({ message: "Get All OilShop Products Successfully", data: products });
   } catch (error) {
     res.status(500).json({ message: "Something went wrong.", error });
   }
 };
 
-
-
-const deleteProductCtrl = async (req, res) => {
+// ============================================================================
+// 🟨 3. Update Oil Shop Product
+// ============================================================================
+const updateOilShopProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const deleted = await Product.findByIdAndDelete(id);
-
-    if (!deleted) {
-      return res.status(404).json({ message: "Product not found" });
-    }
-
-    res.status(200).json({ message: "Product deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: "Something went wrong.", error });
-  }
-};
-
-const updateProductController = async (req, res) => {
-  try {
-    const { id } = req.params;
-   
-
+    const userId = req.user.id;
     const { productName, price, cost, quantity } = req.body;
     const imageFile = req.file;
 
-    const updated = await Product.findByIdAndUpdate(
-      id,
-      { productName, image: imageFile.filename, price, cost, quantity },
-      { new: true }
+    const updateFields = { productName, price, cost, quantity };
+
+    if (imageFile) updateFields.image = imageFile.filename;
+
+    const updated = await Product.findOneAndUpdate(
+      { _id: id, userId },
+      updateFields,
+      { new: true, runValidators: true }
     );
 
     if (!updated) {
-      return res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({ message: "Product not found." });
     }
 
-    res
-      .status(200)
-      .json({ message: "Product updated successfully", product: updated });
+    res.status(200).json({
+      message: "OilShop product updated successfully.",
+      product: updated,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong.", error });
+    res.status(500).json({
+      message: "Something went wrong while updating the product.",
+      error: error.message,
+    });
   }
 };
 
-
-const saleProductCtrl = async (req, res) => {
+// ============================================================================
+// 🟨 4. Delete Oil Shop Product
+// ============================================================================
+const deleteOilShopProduct = async (req, res) => {
   try {
-    const { productId, quantitySold, sellingPrice } = req.body;
+    const { id } = req.params;
+    const userId = req.user.id;
 
-    // Find product from Product model
-    const product = await Product.findById(productId);
+    const deleted = await Product.findOneAndDelete({ _id: id, userId });
 
-    if (!product || product.quantity < quantitySold) {
-      return  res.status(400).json({ message: "Invalid product or insufficient stock" });
+    if (!deleted) {
+      return res.status(404).json({ message: "Product not found." });
     }
 
-    // Decrease quantity
+    res.status(200).json({ message: "Product deleted successfully." });
+  } catch (error) {
+    res.status(500).json({
+      message: "Something went wrong while deleting the product.",
+      error: error.message,
+    });
+  }
+};
+
+// ============================================================================
+// 🟨 5. Record Oil Sale
+// ============================================================================
+const addOilSale = async (req, res) => {
+  try {
+    const { productId, quantitySold, sellingPrice } = req.body;
+    const userId = req.user.id;
+
+    const product = await Product.findOne({ _id: productId, userId });
+
+    if (!product || product.quantity < quantitySold) {
+      return res
+        .status(400)
+        .json({ message: "Invalid product or insufficient stock." });
+    }
+
+    // Decrease stock
     product.quantity -= quantitySold;
     await product.save();
 
-    // Create sale record
+    // Create Sale Record
     const sale = await Sale.create({
       productId,
       quantitySold,
       sellingPrice,
+      userId,
     });
 
-    // Populate product info in the response
     const populatedSale = await Sale.findById(sale._id).populate("productId");
 
-    res.status(200).json({ message: "Product sale successfully", sale: populatedSale });
+    res.status(200).json({
+      message: "Oil sale recorded successfully.",
+      sale: populatedSale,
+    });
   } catch (error) {
     res.status(500).json({ message: "Something went wrong.", error });
   }
 };
 
-
-const allSaleController = async (req, res) => {
+// ============================================================================
+// 🟨 6. Get All Oil Sales (Filter by Day / Month / Year)
+// ============================================================================
+const getFilteredOilSales = async (req, res) => {
   try {
-    const allSale = await Sale.find().populate("productId");
-    if (!allSale) {
-      return res.status(400).send({ message: "Sale not found" });
-    }
-    res.status(200).send({ message: "Get all sales successfully", allSale });
+    const filter = req.query.filter;
+    const { start, end } = getDateRange(filter);
+
+    const sales = await Sale.find({
+      userId: req.user.id,
+      createdAt: { $gte: start, $lte: end },
+    }).populate("productId");
+
+    res.status(200).json({
+      message: "Filtered oil sales fetched successfully.",
+      data: sales,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong.", error });
+    res.status(500).json({
+      message: "Failed to get filtered oil sales.",
+      error: error.message,
+    });
   }
 };
 
+// ============================================================================
+// 🟨 7. Update Oil Sale Record
+// ============================================================================
+const updateOilSale = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
 
+    const updatedSale = await Sale.findOneAndUpdate(
+      { _id: id, userId },
+      req.body,
+      { new: true, runValidators: true }
+    );
 
+    if (!updatedSale) {
+      return res.status(404).json({
+        success: false,
+        message: "Oil sale record not found.",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Oil sale updated successfully.",
+      data: updatedSale,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to update oil sale.",
+      error: error.message,
+    });
+  }
+};
+
+// ============================================================================
+// 🟨 8. Delete Oil Sale Record
+// ============================================================================
+const deleteOilSale = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+
+    const deletedSale = await Sale.findOneAndDelete({ _id: id, userId });
+
+    if (!deletedSale) {
+      return res.status(404).json({
+        success: false,
+        message: "Oil sale record not found.",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Oil sale deleted successfully.",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete oil sale.",
+      error: error.message,
+    });
+  }
+};
 
 module.exports = {
-  saveOilShopProduct,
-  getAllProduct,
-  deleteProductCtrl,
-  updateProductController,
-  saleProductCtrl,
-  allSaleController,
- 
-  
+  addOilShopProduct,
+  getAllOilShopProducts,
+  updateOilShopProduct,
+  deleteOilShopProduct,
+  addOilSale,
+  getFilteredOilSales,
+  updateOilSale,
+  deleteOilSale,
 };

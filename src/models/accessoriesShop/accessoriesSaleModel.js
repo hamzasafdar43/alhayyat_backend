@@ -21,5 +21,5 @@ const accessoriesSaleSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-const Sale = mongoose.model("SaleAccessories", accessoriesSaleSchema);
-module.exports = Sale;
+const SaleAccessories = mongoose.model("SaleAccessories", accessoriesSaleSchema);
+module.exports = SaleAccessories;
