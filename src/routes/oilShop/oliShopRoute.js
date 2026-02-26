@@ -1,24 +1,49 @@
 const express = require("express");
-const { saveOilShopProduct, getAllProduct, updateProductController, deleteProductCtrl, saleProductCtrl, allSaleController } = require("../../controller/oilShop/oilShopCtrl");
+
+
 const upload = require("../../middleware/upload");
-const UserAuthenication = require("../../middleware/UserAuthenication");
+const UserAuthentication = require("../../middleware/UserAuthenication");
+const {   addOilShopProduct,
+  getAllOilShopProducts,
+  updateOilShopProduct,
+  deleteOilShopProduct,
+  addOilSale,
+  getFilteredOilSales,
+  updateOilSale,
+  deleteOilSale,
+  getOilShopBillByDate, } = require("../../controller/oilShop/oilShopCtrl");
+
 const router = express.Router();
 
 
-router.post("/add-product", UserAuthenication, upload.single("image"), saveOilShopProduct);
-router.get("/all-product", UserAuthenication, getAllProduct);
-router.put("/update-product/:id", UserAuthenication, upload.single("image"), updateProductController);
-router.delete("/delete-product/:id", UserAuthenication, deleteProductCtrl);
+router.post(
+  "/add-product",
+  UserAuthentication,
+  upload.single("image"),
+  addOilShopProduct
+);
+
+router.get("/all-products", UserAuthentication, getAllOilShopProducts);
+
+router.put(
+  "/update-product/:id",
+  UserAuthentication,
+  upload.single("image"),
+  updateOilShopProduct
+);
+
+router.delete(
+  "/delete-product/:id",
+  UserAuthentication,
+  deleteOilShopProduct
+);
 
 
-
-// sale Product routes
-
-router.post("/sale-product", saleProductCtrl);
-router.get("/all-sales", allSaleController);
-
-
-
+router.post("/add-sale", UserAuthentication, addOilSale);
+router.get("/sales", UserAuthentication, getFilteredOilSales);
+router.put("/update-sale/:id", UserAuthentication, updateOilSale);
+router.delete("/delete-sale/:id", UserAuthentication, deleteOilSale);
+router.get("/bills-by-date", UserAuthentication, getOilShopBillByDate);
 
 
 module.exports = router;
