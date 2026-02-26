@@ -9,8 +9,10 @@ const getAllDetailingStudioBills = async (req, res) => {
     try {
         const filter = req.query.filter;
         const { start, end } = getDateRange(filter);
+      
 
         const bills = await detailingBill.find({
+            userId : req.user.id,
             createdAt: { $gte: start, $lte: end }
         });
 
@@ -36,6 +38,7 @@ const getDetailingBillByDate = async (req, res) => {
         const end = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
 
         const bills = await detailingBill.find({
+            userId : req.user.id,
             createdAt: { $gte: start, $lte: end },
         });
 
@@ -54,12 +57,13 @@ const getDetailingBillByDate = async (req, res) => {
 const updateDetailingCommissionStatus = async (req, res) => {
     try {
         const { _id } = req.body;
+        const userId = req.user.id;
 
         if (!_id) {
             return res.status(400).json({ message: "Bill ID is required" });
         }
 
-        const record = await detailingBill.findById(_id);
+        const record = await detailingBill.findById({_id , userId});
 
         if (!record) {
             return res.status(404).json({ message: "Detailing record not found" });

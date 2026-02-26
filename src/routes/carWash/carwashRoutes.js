@@ -1,20 +1,17 @@
 const express = require("express");
-const { generatecarwashbillCtrl ,getallbills  ,  updateCarWashbill, deleteCarWashbill, getCarWashBillByDate, updateCommissionStatus} = require("../../controller/carWash/carwashCtrl");
+const { getallbills  ,  updateCarWashbill, deleteCarWashbill, getCarWashBillByDate, updateCommissionStatus} = require("../../controller/carWash/carwashCtrl");
 const router = express.Router();
-// const UserAuthenication = require("../../middleware/UserAuthenication")
-const upload = require("../../middleware/upload");
-const { saveOilShopProduct } = require("../../controller/oilShop/oilShopCtrl");
+const UserAuthenication = require("../../middleware/UserAuthenication");
 
 
 
-router.post("/carWash-bill",  generatecarwashbillCtrl  );
-router.get("/carWash-bills",  getallbills);
-router.post("/commission-paid",  updateCommissionStatus);
+router.get("/carWash-bills", UserAuthenication , getallbills);
+router.post("/commission-paid",UserAuthenication ,  updateCommissionStatus);
 
-router.get("/carWash-bill-date",  getCarWashBillByDate);
-router.delete("/carWash-bill-delete/:id",  deleteCarWashbill);
-router.put("/carWash-bills-update/:id",  updateCarWashbill);
-router.post("/add-product" , upload.single("image") , saveOilShopProduct)
+router.get("/carWash-bill-date", UserAuthenication,  getCarWashBillByDate);
+router.delete("/carWash-bill-delete/:id", UserAuthenication,  deleteCarWashbill);
+router.put("/carWash-bills-update/:id", UserAuthenication,  updateCarWashbill);
+
 
 
 

@@ -3,46 +3,26 @@ const carWash = require("../../models/carWash/carwashModel")
 
 
 // ============================================================================
-// 🟨 1. // generatecarwashbillCtrl
-// ============================================================================
-const generatecarwashbillCtrl = async (req, res) => {
-    try {
-        const { carName, bill, commission, carWasher, phoneNumber } = req.body;
-
-        const newBill = new carWash({
-            carName,
-            bill,
-            commission,
-            carWasher,
-            phoneNumber
-        });
-
-        await newBill.save();
-
-        res.status(200).json({ message: "Car wash bill generated successfully", bill: newBill });
-    } catch (error) {
-        res.status(500).json({ message: "Something went wrong", error: error.message });
-    }
-};
-
-
-// ============================================================================
 // 🟨 2. Get all bills by filter (day, month, year)
 // ============================================================================
 const getallbills = async (req, res) => {
-    try {
-        const filter = req.query.filter;
-        const { start, end } = getDateRange(filter);
+  try {
+    const filter = req.query.filter;
+    const { start, end } = getDateRange(filter);
 
-        const bills = await carWash.find({
-            createdAt: { $gte: start, $lte: end }
-        });
+    // ✅ Correct: userId and createdAt are separate fields
+    const bills = await carWash.find({
+      userId: req.user.id,
+      createdAt: { $gte: start, $lte: end },
+    });
 
-        res.status(200).json(bills);
-    } catch (error) {
-        res.status(500).json({ message: "Failed to get filtered bills", error: error.message });
-    }
-}
+    res.status(200).json(bills);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Failed to get filtered bills", error: error.message });
+  }
+};
 
 // ============================================================================
 // 🟨 3. Get bills by specific date
@@ -55,9 +35,9 @@ const getCarWashBillByDate = async (req, res) => {
     const d = new Date(date);
     const start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0);
     const end = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
-
+    const userId = req.user.id
     const bills = await carWash.find({
-        createdAt: { $gte: start, $lte: end },
+        userId, createdAt: { $gte: start, $lte: end },
     });
 
     res.json(bills);
@@ -69,8 +49,9 @@ const getCarWashBillByDate = async (req, res) => {
 const updateCommissionStatus = async (req, res) => {
     try {
         const { _id } = req.body;
+        const userId = req.user.id;
 
-        const carWashRecord = await carWash.findById(_id);
+        const carWashRecord = await carWash.findById({ _id, userId });
 
         if (!carWashRecord) {
             return res.status(404).json({ message: "Car wash record not found" });
@@ -101,9 +82,13 @@ const updateCommissionStatus = async (req, res) => {
 const updateCarWashbill = async (req, res) => {
 
     try {
-        const updatedbill = await carWash.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
-        });
+        const userId = req.user.id;
+
+        const updatedbill = await carWash.findOneAndUpdate(
+            { _id: req.params.id, userId }, // 👈 secure query
+            req.body,
+            { new: true }
+        );
         if (!updatedbill) {
             return res.status(404).json({ message: "bill are not found" });
         }
@@ -119,7 +104,8 @@ const updateCarWashbill = async (req, res) => {
 // ============================================================================
 const deleteCarWashbill = async (req, res) => {
     try {
-        const deletedbill = await carWash.findByIdAndDelete(req.params.id);
+         const userId = req.user.id;
+        const deletedbill = await carWash.findByIdAndDelete({ _id: req.params.id, userId});
         if (!deletedbill) {
             return res.status(404).json({ message: "Car wash bill not found" });
         }
@@ -131,7 +117,6 @@ const deleteCarWashbill = async (req, res) => {
 
 
 module.exports = {
-    generatecarwashbillCtrl,
     getallbills,
     updateCarWashbill,
     deleteCarWashbill,

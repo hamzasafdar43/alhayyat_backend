@@ -11,6 +11,7 @@ const accessoriesRoutes = require("./routes/accessories/accessoriesRoute");
 const generateBillRoutes = require("./routes/generateBillRoute/generateBillRoute");
 const detailingStudioRutes = require("./routes/detailingStudio/detailingStudioRoute")
 const employeesRutes = require("./routes/empolyees/empolyeeRoutes")
+const expenseRoutes = require("./routes/expense/expenseRoutes")
 
 
 dotenv.config();
@@ -32,6 +33,7 @@ app.use("/", accessoriesRoutes);
 app.use("/", generateBillRoutes);
 app.use("/", detailingStudioRutes);
 app.use("/", employeesRutes);
+app.use("/", expenseRoutes);
 
 // Start server (for local development)
 const PORT = process.env.PORT || 5000;

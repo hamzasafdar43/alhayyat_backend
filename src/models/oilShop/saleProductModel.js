@@ -14,7 +14,12 @@ const saleSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    require: true
+  }
 }, { timestamps: true });
 
-const Sale = mongoose.model("Sale", saleSchema);
-module.exports = Sale;
+const SaleOilProduct = mongoose.model("SaleOilProduct", saleSchema);
+module.exports = SaleOilProduct;

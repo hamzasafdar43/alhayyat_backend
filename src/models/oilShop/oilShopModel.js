@@ -14,12 +14,17 @@ const oilShopSchema = new mongoose.Schema({
     required: true
   },
   cost: {
-    type: Number, 
+    type: Number,
     required: true
   },
   quantity: {
     type: Number,
     required: true
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    require: true
   }
 }, { timestamps: true });
 
