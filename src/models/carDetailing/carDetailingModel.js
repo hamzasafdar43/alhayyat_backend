@@ -7,7 +7,7 @@ const carDetailingSaleSchema = new mongoose.Schema({
     required: true
   },
   polish: {
-     type: String,
+    type: String,
     required: true
   },
   detailingMaster: {
@@ -22,6 +22,15 @@ const carDetailingSaleSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  commissionStatus: {
+    type: String,
+    default: "pending"
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    require: true
+  }
 }, { timestamps: true });
 
 const carDetailing = mongoose.model("cardetailing", carDetailingSaleSchema);

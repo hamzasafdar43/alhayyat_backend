@@ -19,7 +19,12 @@ const employeeSchema = new mongoose.Schema({
   designation: {
     type: String,
     required: true
-  }
+  },
+   userId : {
+          type:mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          require:true
+      }
 }, { timestamps: true });
 
 module.exports = mongoose.model("Employee", employeeSchema);

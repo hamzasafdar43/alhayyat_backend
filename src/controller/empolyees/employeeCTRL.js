@@ -4,12 +4,13 @@ const Employee = require("../../models/empolyees/empolyeeModel");
 exports.createEmployee = async (req, res) => {
   try {
     const { name, email, phone, designation } = req.body;
+    const userId = req.user.id;
 
     if (!name || !email || !phone || !designation) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    const employee = new Employee({ name, email, phone, designation });
+    const employee = new Employee({ name, email, phone, designation , userId });
     await employee.save();
 
     res.status(201).json({ message: "Employee created successfully", employee });
@@ -21,7 +22,8 @@ exports.createEmployee = async (req, res) => {
 // Get all employees
 exports.getEmployees = async (req, res) => {
   try {
-    const employees = await Employee.find();
+  const userId = req.user.id;
+   const employees = await Employee.find({ userId });
     res.status(200).json(employees);
   } catch (error) {
     res.status(500).json({ message: "Error fetching employees", error: error.message });
@@ -31,7 +33,8 @@ exports.getEmployees = async (req, res) => {
 // ✅ Get single employee by ID
 exports.getEmployeeById = async (req, res) => {
   try {
-    const employee = await Employee.findById(req.params.id);
+    const userId = req.user.id;
+    const employee = await Employee.findOne({ _id: req.params.id, userId }); 
     if (!employee) {
       return res.status(404).json({ message: "Employee not found" });
     }
@@ -45,9 +48,10 @@ exports.getEmployeeById = async (req, res) => {
 exports.updateEmployee = async (req, res) => {
   try {
     const { name, email, phone, designation } = req.body;
-
-    const employee = await Employee.findByIdAndUpdate(
-      req.params.id,
+     const userId = req.user.id;
+   
+    const employee = await Employee.findOneAndUpdate(
+      { _id: req.params.id, userId }, // ✅ condition
       { name, email, phone, designation },
       { new: true, runValidators: true }
     );
@@ -65,7 +69,9 @@ exports.updateEmployee = async (req, res) => {
 // ✅ Delete employee by ID
 exports.deleteEmployee = async (req, res) => {
   try {
-    const employee = await Employee.findByIdAndDelete(req.params.id);
+    const userId = req.user.id;
+
+   const employee = await Employee.findOneAndDelete({ _id: req.params.id, userId });
 
     if (!employee) {
       return res.status(404).json({ message: "Employee not found" });
