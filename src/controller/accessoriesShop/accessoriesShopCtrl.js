@@ -157,6 +157,27 @@ const SaleAccessoriesCtr = async (req, res) => {
   }
 };
 
+
+// ============================================================================
+// 🟨 3. Get bills by specific date
+// ============================================================================
+
+const getAccessoriesBillByDate = async (req, res) => {
+    const { date } = req.query;
+
+    if (!date) return res.status(400).json({ message: "Date is required" });
+
+    const d = new Date(date);
+    const start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0);
+    const end = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
+    const userId = req.user.id
+    const bills = await SaleAccessories.find({
+        userId, createdAt: { $gte: start, $lte: end },
+    });
+
+    res.json(bills);
+}
+
 // ============================================================================
 // 🟨 5. Update Accessories Sale Record
 // ============================================================================
@@ -231,6 +252,7 @@ AddItemAccessories,
  getAllItemAccessories,
  SaleAccessoriesCtr,
  updateAccessoriesSale,
- deleteAccessoriesSale
+ deleteAccessoriesSale,
+ getAccessoriesBillByDate,
   
 };

@@ -156,28 +156,47 @@ const addOilSale = async (req, res) => {
 
 // ============================================================================
 // 🟨 6. Get All Oil Sales (Filter by Day / Month / Year)
-// ============================================================================
+// ===========================================================================
+
+
 const getFilteredOilSales = async (req, res) => {
   try {
     const filter = req.query.filter;
+    
     const { start, end } = getDateRange(filter);
+    
 
     const sales = await Sale.find({
       userId: req.user.id,
       createdAt: { $gte: start, $lte: end },
     }).populate("productId");
-
-    res.status(200).json({
-      message: "Filtered oil sales fetched successfully.",
-      data: sales,
-    });
+  
+    res.status(200).json(sales);
   } catch (error) {
-    res.status(500).json({
-      message: "Failed to get filtered oil sales.",
-      error: error.message,
-    });
+    res
+      .status(500)
+      .json({ message: "Failed to get filtered bills", error: error.message });
   }
 };
+
+// ============================================================================
+// 🟨 3. Get bills by specific date
+// ============================================================================
+const getOilShopBillByDate = async (req, res) => {
+    const { date } = req.query;
+
+    if (!date) return res.status(400).json({ message: "Date is required" });
+
+    const d = new Date(date);
+    const start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0);
+    const end = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
+    const userId = req.user.id
+    const bills = await Sale.find({
+        userId, createdAt: { $gte: start, $lte: end },
+    });
+
+    res.json(bills);
+}
 
 // ============================================================================
 // 🟨 7. Update Oil Sale Record
@@ -253,4 +272,5 @@ module.exports = {
   getFilteredOilSales,
   updateOilSale,
   deleteOilSale,
+  getOilShopBillByDate,
 };
