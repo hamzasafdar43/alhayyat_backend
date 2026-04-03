@@ -100,7 +100,7 @@ const getExpensesByDate = async (req, res) => {
 
     const expenseType = "daily";
     const userId = req.user.id
-    const filter = { userId, expenseType };
+    
 
     const d = new Date(date);
     const start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0);
@@ -116,7 +116,47 @@ const getExpensesByDate = async (req, res) => {
     res.json(bills);
 }
 
+const getMonthlyExpensesData = async ( req, res ) => {
+    try {
+        const { month, year } = req.query;
+       
+    const expenseType = "monthly";
+
+        if (!month || !year) {
+            return res.status(400).json({ message: "Month and year are required" });
+        }
+        const start = new Date(year, month - 1, 1);
+        const end = new Date(year, month, 0, 23, 59, 59, 999);
+        const bills = await Expense.find({
+           expenseType , userId : req.user.id,
+            createdAt: { $gte: start, $lte: end }
+        });
+        res.status(200).json(bills);
+    } catch (error) {
+        res.status(500).json({ message: "Failed to get monthly expenses data", error: error.message });
+    }
+}
+
+const getMonthlyDailyExpense = async ( req, res ) => {
+    try {
+        const { month, year } = req.query;
+       
+    const expenseType = "daily";
+        if (!month || !year) {
+            return res.status(400).json({ message: "Month and year are required" });
+        }
+        const start = new Date(year, month - 1, 1);
+        const end = new Date(year, month, 0, 23, 59, 59, 999);
+        const bills = await Expense.find({
+           expenseType , userId : req.user.id,
+            createdAt: { $gte: start, $lte: end }
+        });
+        res.status(200).json(bills);
+    } catch (error) {
+        res.status(500).json({ message: "Failed to get monthly expenses data", error: error.message });
+    }
+}
 
 module.exports = {
-    createExpense, deleteExpense, getExpenses, updateExpense , getExpensesByDate
+    createExpense, deleteExpense, getExpenses, updateExpense , getExpensesByDate, getMonthlyExpensesData , getMonthlyDailyExpense
 };

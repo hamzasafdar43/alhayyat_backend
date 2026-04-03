@@ -11,7 +11,8 @@ const {   addOilShopProduct,
   getFilteredOilSales,
   updateOilSale,
   deleteOilSale,
-  getOilShopBillByDate, } = require("../../controller/oilShop/oilShopCtrl");
+  getOilShopBillByDate,
+  getOilShopMonthlyData, } = require("../../controller/oilShop/oilShopCtrl");
 
 const router = express.Router();
 
@@ -44,6 +45,7 @@ router.get("/sales", UserAuthentication, getFilteredOilSales);
 router.put("/update-sale/:id", UserAuthentication, updateOilSale);
 router.delete("/delete-sale/:id", UserAuthentication, deleteOilSale);
 router.get("/bills-by-date", UserAuthentication, getOilShopBillByDate);
+router.get("/oil/monthly-data", UserAuthentication, getOilShopMonthlyData);
 
 
 module.exports = router;

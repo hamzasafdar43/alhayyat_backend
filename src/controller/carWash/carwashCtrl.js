@@ -116,11 +116,32 @@ const deleteCarWashbill = async (req, res) => {
 };
 
 
+const getCarWashDataMonthly = async ( req, res ) => {
+    try {
+        const { month, year } = req.query;
+       
+
+        if (!month || !year) {
+            return res.status(400).json({ message: "Month and year are required" });
+        }
+        const start = new Date(year, month - 1, 1);
+        const end = new Date(year, month, 0, 23, 59, 59, 999);
+        const bills = await carWash.find({
+            userId : req.user.id,
+            createdAt: { $gte: start, $lte: end }
+        });
+        res.status(200).json(bills);
+    } catch (error) {
+        res.status(500).json({ message: "Failed to get monthly detailing data", error: error.message });
+    }
+}
+
 module.exports = {
     getallbills,
     updateCarWashbill,
     deleteCarWashbill,
     getCarWashBillByDate,
-    updateCommissionStatus
+    updateCommissionStatus,
+    getCarWashDataMonthly,
 
 };
