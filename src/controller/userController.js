@@ -36,16 +36,16 @@ const login = async (req, res) => {
       }
   
       const user = await User.findOne({ email });
-      if (!user) return res.status(400).json({ message: 'Invalid credentials' });
+      if (!user) return res.status(400).send({ message: 'Invalid credentials' });
   
       const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+      if (!isMatch) return res.status(400).send({ message: 'Invalid credentials' });
 
       if (!process?.env?.JWT_SECRET) {
         throw new Error('JWT_SECRET is not defined in .env file');
       }
   
-      const token = await jwt.sign({ id: user._id }, process?.env?.JWT_SECRET, { expiresIn: '1h' });
+      const token = await jwt.sign({ id: user._id }, process?.env?.JWT_SECRET);
   
       res.json({ token, user: { id: user._id, name: user.name, email: user.email } });
     } catch (err) {
