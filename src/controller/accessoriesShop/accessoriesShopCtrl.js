@@ -95,7 +95,7 @@ const updateItemAccessories = async (req, res) => {
     const { productName, price, cost, quantity } = req.body;
     const imageFile = req.file;
 
-    console.log("..........", imageFile)
+   
 
     // Prepare update fields
     const updateFields = {
@@ -243,6 +243,25 @@ const deleteAccessoriesSale = async (req, res) => {
   }
 };
 
+const getAccessoriesDataMonthly = async ( req, res ) => {
+    try {
+        const { month, year } = req.query;
+       
+
+        if (!month || !year) {
+            return res.status(400).json({ message: "Month and year are required" });
+        }
+        const start = new Date(year, month - 1, 1);
+        const end = new Date(year, month, 0, 23, 59, 59, 999);
+        const bills = await SaleAccessories.find({
+            userId : req.user.id,
+            createdAt: { $gte: start, $lte: end }
+        }).populate("productId");
+        res.status(200).json(bills);
+    } catch (error) {
+        res.status(500).json({ message: "Failed to get monthly accessories data", error: error.message });
+    }
+}
 
 
 module.exports = {
@@ -254,5 +273,6 @@ AddItemAccessories,
  updateAccessoriesSale,
  deleteAccessoriesSale,
  getAccessoriesBillByDate,
+  getAccessoriesDataMonthly,
   
 };
