@@ -109,6 +109,41 @@ const getDetailingDataMonthly = async ( req, res ) => {
     }
 }
 
+
+
+const deleteDetailingStudioConttroller = async (req, res) => {
+    try {
+         const userId = req.user.id;
+        const deletedbill = await detailingBill.findByIdAndDelete({ _id: req.params.id, userId});
+        if (!deletedbill) {
+            return res.status(404).json({ message: "Detailing bill not found" });
+        }
+        res.status(200).json({ message: "Bill deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to delete product", error: error.message });
+    }
+};
+
+
+const updateDetailingStudioController = async (req, res) => {
+
+    try {
+        const userId = req.user.id;
+
+        const updatedbill = await detailingBill.findOneAndUpdate(
+            { _id: req.params.id, userId }, 
+            req.body,
+            { new: true }
+        );
+        if (!updatedbill) {
+            return res.status(404).json({ message: "Detailing bill not found" });
+        }
+        res.status(200).json({ message: "Bill updated successfully", bill: updatedbill });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to update product", error: error.message });
+    }
+};
+
 // ============================================================================
 // 🟨 Exports
 // ============================================================================
@@ -117,4 +152,6 @@ module.exports = {
     getDetailingBillByDate,
     updateDetailingCommissionStatus,
     getDetailingDataMonthly,
+    deleteDetailingStudioConttroller,
+    updateDetailingStudioController
 };
